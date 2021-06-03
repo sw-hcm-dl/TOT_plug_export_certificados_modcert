@@ -75,8 +75,8 @@ require_capability('mod/certificate:manage', $context);
 // Declare some variables
 $strcertificates = get_string('modulenameplural', 'certificate');
 $strcertificate  = get_string('modulename', 'certificate');
-$strto = get_string('awardedto', 'certificate');
-$strdate = get_string('receiveddate', 'certificate');
+$strto = get_string('awardedto_cert', 'certificate');
+$strdate = get_string('receiveddate_cert', 'certificate');
 $strgrade = get_string('grade','certificate');
 $strcode = get_string('code', 'certificate');
 $strreport= get_string('report', 'certificate');
@@ -285,8 +285,8 @@ if ($download == "zip") {
         unlink($tempdirname."/".$filename);
     }
     rmdir($tempdirname);
-    
-    $zipfilename = userdate(time()).'_'.$certificate->name.'.zip';
+    $date = strftime("%d_%m_%Y" , time());
+    $zipfilename = $date.'_'.$certificate->name.'_'.$course->fullname.'.zip';
     $zipfilename = clean_filename($zipfilename);
     header("Content-Disposition: attachment; filename=\"" . basename($zipfilename) . "\"");
     header('Content-type: application/zip');
