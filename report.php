@@ -30,10 +30,11 @@ $id   = required_param('id', PARAM_INT); // Course module ID
 $sort = optional_param('sort', '', PARAM_RAW);
 $download = optional_param('download', '', PARAM_ALPHA);
 $action = optional_param('action', '', PARAM_ALPHA);
+$start = optional_param('start', null, PARAM_TEXT);
+$end = optional_param('end', null, PARAM_TEXT);
 
 $page = optional_param('page', 0, PARAM_INT);
 $perpage = optional_param('perpage', CERT_PER_PAGE, PARAM_INT);
-
 // Ensure the perpage variable does not exceed the max allowed if
 // the user has not specified they wish to view all certificates.
 if (CERT_PER_PAGE !== 0) {
@@ -51,7 +52,9 @@ if ($download) {
 if ($action) {
     $url->param('action', $action);
 }
+
 $PAGE->set_url($url);
+$PAGE->requires->css('/mod/certificate/styles.css');
 
 if (!$cm = get_coursemodule_from_id('certificate', $id)) {
     print_error('Course Module ID was incorrect');
@@ -80,6 +83,11 @@ $strdate = get_string('receiveddate_cert', 'certificate');
 $strgrade = get_string('grade','certificate');
 $strcode = get_string('code', 'certificate');
 $strreport= get_string('report', 'certificate');
+$strdatesreport = get_string('report_date', 'certificate');
+$strapply = get_string('apply', 'certificate');
+$strcancel = get_string('cancel', 'certificate');
+
+$PAGE->requires->js_call_amd('mod_certificate/navigation', 'init');
 
 if (!$download) {
     $PAGE->navbar->add($strreport);
@@ -96,9 +104,19 @@ if (!$download) {
 }
 
 // Ensure there are issues to display, if not display notice
-if (!$users = certificate_get_issues($certificate->id, $DB->sql_fullname(), $groupmode, $cm, $page, $perpage)) {
+if (!$users = certificate_get_issues($certificate->id, $DB->sql_fullname(), $groupmode, $cm, $page, $perpage, $start, $end)) {
     echo $OUTPUT->header();
     groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/certificate/report.php?id='.$id);
+    //If filter not results
+    echo '<form method="get" id="filter-dates" action="">';
+    echo '<div>';
+    echo '<span id="date-issued">'.$strdatesreport.'</span>';
+    echo '<input id="date-start" value="'.$start.'" name="start" type="date">';
+    echo '<input id="date-end" value="'.$end.'" name="end" type="date">';
+    echo '<button class="btn btn-default" id="apply-filter" value="'.$id.'" name="id" type="submit">'.$strapply.'</button>';
+    echo '<button class="btn btn-default" id="clear-filter" value="'.$id.'" name="id" type="submit">'.$strcancel.'</button>';
+    echo '</div>';
+    echo '</form>';
     echo $OUTPUT->notification(get_string('nocertificatesissued', 'certificate'));
     echo $OUTPUT->footer($course);
     exit();
@@ -285,8 +303,15 @@ if ($download == "zip") {
         unlink($tempdirname."/".$filename);
     }
     rmdir($tempdirname);
-    $date = strftime("%d_%m_%Y" , time());
-    $zipfilename = $date.'_'.$certificate->name.'_'.$course->fullname.'.zip';
+    if($start != null && $end != null){
+        $date_ini = date("dmY", strtotime($start));
+        $date_fin = date("dmY", strtotime($end));
+        $date = $date_ini.'_'.$date_fin;
+    }else{
+        $date = strftime("%d%m%Y" , time());
+    }
+    
+    $zipfilename = $date.'_'.$certificate->name.'.zip';
     $zipfilename = clean_filename($zipfilename);
     header("Content-Disposition: attachment; filename=\"" . basename($zipfilename) . "\"");
     header('Content-type: application/zip');
@@ -295,7 +320,7 @@ if ($download == "zip") {
     exit;
 }
 
-$usercount = count(certificate_get_issues($certificate->id, $DB->sql_fullname(), $groupmode, $cm));
+$usercount = count(certificate_get_issues($certificate->id, $DB->sql_fullname(), $groupmode, $cm, '', '', $start, $end));
 
 // Create the table for the users
 $table = new html_table();
@@ -311,16 +336,27 @@ foreach ($users as $user) {
 // Create table to store buttons
 $tablebutton = new html_table();
 $tablebutton->attributes['class'] = 'downloadreport';
-$btndownloadods = $OUTPUT->single_button(new moodle_url("report.php", array('id'=>$cm->id, 'download'=>'ods')), get_string("downloadods"));
-$btndownloadxls = $OUTPUT->single_button(new moodle_url("report.php", array('id'=>$cm->id, 'download'=>'xls')), get_string("downloadexcel"));
-$btndownloadtxt = $OUTPUT->single_button(new moodle_url("report.php", array('id'=>$cm->id, 'download'=>'txt')), get_string("downloadtext"));
+$btndownloadods = $OUTPUT->single_button(new moodle_url("report.php", array('id'=>$cm->id, 'download'=>'ods', 'start' => $start, 'end' => $end)), get_string("downloadods"));
+$btndownloadxls = $OUTPUT->single_button(new moodle_url("report.php", array('id'=>$cm->id, 'download'=>'xls', 'start' => $start, 'end' => $end)), get_string("downloadexcel"));
+$btndownloadtxt = $OUTPUT->single_button(new moodle_url("report.php", array('id'=>$cm->id, 'download'=>'txt', 'start' => $start, 'end' => $end)), get_string("downloadtext"));
 #@Solutto
 #Add the button to download all in zip
-$btndownloadzip = $OUTPUT->single_button(new moodle_url("report.php", array('id'=>$cm->id, 'download'=>'zip')), get_string("downloadall"));
+$btndownloadzip = $OUTPUT->single_button(new moodle_url("report.php", array('id'=>$cm->id, 'download'=>'zip','start' => $start, 'end' => $end)), get_string("downloadall"));
 $tablebutton->data[] = array($btndownloadods, $btndownloadxls, $btndownloadtxt, $btndownloadzip);
 
 echo $OUTPUT->header();
 groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/certificate/report.php?id='.$id);
+
+//Add datepicker filter
+echo '<form method="get" id="filter-dates" action="">';
+echo '<div>';
+echo '<span id="date-issued">'.$strdatesreport.'</span>';
+echo '<input id="date-start" value="'.$start.'" name="start" type="date">';
+echo '<input id="date-end" value="'.$end.'" name="end" type="date">';
+echo '<button class="btn btn-default" id="apply-filter" value="'.$id.'" name="id" type="submit">'.$strapply.'</button>';
+echo '<button class="btn btn-default" id="clear-filter" value="'.$id.'" name="id" type="submit">'.$strcancel.'</button>';
+echo '</div>';
+echo '</form>';
 echo $OUTPUT->heading(get_string('modulenameplural', 'certificate'));
 echo $OUTPUT->paging_bar($usercount, $page, $perpage, $url);
 echo '<br />';

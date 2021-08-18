@@ -1,0 +1,33 @@
+#filter-dates{
+    margin-top: 5px;
+    float: right;
+}
+
+.lang-en #filter-dates{
+    margin-right: 19%;
+}
+
+.lang-es #filter-dates{
+    margin-right: 13%;
+}
+
+#date-start,
+#date-end{
+    margin-right: 16px;
+    height: 33px;
+}
+
+.editing #filter-dates{
+    width: 100%;
+    float: none;
+}
+
+#date-issued{
+    font-weight: bold;
+}
+
+button#apply-filter,
+button#clear-filter{
+    margin-right: 15px;
+    margin-top: -3px;
+}

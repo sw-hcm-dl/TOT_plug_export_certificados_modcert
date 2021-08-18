@@ -26,4 +26,7 @@
 
 $string['awardedto_cert'] = 'Otorgado a';
 $string['receiveddate_cert'] = 'Fecha de recepción';
+$string['report_date'] = 'Fecha de recepción:';
+$string['apply'] = 'Aplicar';
+$string['cancel'] = 'Limpiar';
 

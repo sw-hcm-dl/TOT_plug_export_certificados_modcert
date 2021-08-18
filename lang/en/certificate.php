@@ -246,4 +246,6 @@ $string['certnamefilter'] = 'Certificate name contains';
 $string['usernamefilter'] = 'Username contains';
 $string['firstnamefilter'] = 'First name contains';
 $string['lastnamefilter'] = 'Last name contains';
-
+$string['report_date'] = 'Date Received:';
+$string['apply'] = 'Apply';
+$string['cancel'] = 'Clear';

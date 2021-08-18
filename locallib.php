@@ -416,12 +416,16 @@ function certificate_get_issue($course, $user, $certificate, $cm) {
  * @param int $perpage total per page
  * @return stdClass the users
  */
-function certificate_get_issues($certificateid, $sort="ci.timecreated ASC", $groupmode, $cm, $page = 0, $perpage = 0) {
+function certificate_get_issues($certificateid, $sort="ci.timecreated ASC", $groupmode, $cm, $page = 0, $perpage = 0, $start = null, $end = null) {
     global $CFG, $DB;
-
     // get all users that can manage this certificate to exclude them from the report.
     $context = context_module::instance($cm->id);
-
+    if($start){
+        $date_ini = strtotime($start);
+    }
+    if($end){
+        $date_fin = strtotime ('+1 days' , strtotime ($end)); 
+    }
     $conditionssql = '';
     $conditionsparams = array();
     if ($certmanagers = array_keys(get_users_by_capability($context, 'mod/certificate:manage', 'u.id'))) {
@@ -472,17 +476,27 @@ function certificate_get_issues($certificateid, $sort="ci.timecreated ASC", $gro
 
     // Get all the users that have certificates issued, should only be one issue per user for a certificate
     $allparams = $conditionsparams + array('certificateid' => $certificateid);
-
     // The picture fields also include the name fields for the user.
     $picturefields = user_picture::fields('u');
-    $users = $DB->get_records_sql("SELECT $picturefields, u.idnumber, ci.code, ci.timecreated
+
+    if($start != null && $end != null){
+        $users = $DB->get_records_sql("SELECT $picturefields, u.idnumber, ci.code, ci.timecreated
                                      FROM {user} u
                                INNER JOIN {certificate_issues} ci
                                        ON u.id = ci.userid
-                                    WHERE u.deleted = 0
+                                    WHERE u.deleted = 0  AND ci.timecreated BETWEEN '$date_ini' AND '$date_fin'
                                       AND ci.certificateid = :certificateid $conditionssql
                                  ORDER BY {$sort}", $allparams, $page * $perpage, $perpage);
-
+    }else{
+        $users = $DB->get_records_sql("SELECT $picturefields, u.idnumber, ci.code, ci.timecreated
+                                     FROM {user} u
+                               INNER JOIN {certificate_issues} ci
+                                       ON u.id = ci.userid
+                                    WHERE u.deleted = 0 
+                                      AND ci.certificateid = :certificateid $conditionssql
+                                 ORDER BY {$sort}", $allparams, $page * $perpage, $perpage);
+    }
+    
     return $users;
 }
 
