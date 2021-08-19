@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 #@Solutto
 #Increase the version for avoid upgrades
 #Original version: 2020100100
-$plugin->version   = 2025052301; // The current module version (Date: YYYYMMDDXX)
+$plugin->version   = 2025052302; // The current module version (Date: YYYYMMDDXX)
 $plugin->requires  = 2017111309; // Requires this Moodle version
 $plugin->cron      = 0; // Period for cron to check this module (secs)
 $plugin->component = 'mod_certificate';

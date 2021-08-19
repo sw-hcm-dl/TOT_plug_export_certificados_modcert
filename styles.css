@@ -1,33 +1,37 @@
 #filter-dates{
-    margin-top: 5px;
-    float: right;
+    display: inline-block;
 }
-
-.lang-en #filter-dates{
-    margin-right: 19%;
-}
-
-.lang-es #filter-dates{
-    margin-right: 13%;
-}
-
-#date-start,
-#date-end{
-    margin-right: 16px;
-    height: 33px;
-}
-
-.editing #filter-dates{
-    width: 100%;
-    float: none;
-}
-
 #date-issued{
     font-weight: bold;
 }
-
-button#apply-filter,
-button#clear-filter{
+#filter-dates input{
+    padding: 6px 2px;
+    font-size: 14px;
+    color: #767676;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    margin: 4px;
+}
+#filter-dates input:focus{
+    border-color: #66afe9;
+    outline: 0;
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%), 0 0 8px rgb(102 175 233 / 60%);
+}
+#filter-dates button{
+    margin: 3px;
+}
+#page-mod-certificate-report div.groupselector{
     margin-right: 15px;
-    margin-top: -3px;
+}
+#page-mod-certificate-report form#selectgroup label,
+span#date-issued{
+    display: block;
+}
+#page-mod-certificate-report div.filter-content{
+    display: flex;
+    align-items: center;
 }

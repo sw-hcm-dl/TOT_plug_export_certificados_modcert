@@ -349,12 +349,12 @@ groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/certificate/report.php?id=
 
 //Add datepicker filter
 echo '<form method="get" id="filter-dates" action="">';
-echo '<div>';
 echo '<span id="date-issued">'.$strdatesreport.'</span>';
+echo '<div class="filter-content">';
 echo '<input id="date-start" value="'.$start.'" name="start" type="date">';
 echo '<input id="date-end" value="'.$end.'" name="end" type="date">';
-echo '<button class="btn btn-default" id="apply-filter" value="'.$id.'" name="id" type="submit">'.$strapply.'</button>';
-echo '<button class="btn btn-default" id="clear-filter" value="'.$id.'" name="id" type="submit">'.$strcancel.'</button>';
+echo '<button class="btn btn-primary btn-sm" id="apply-filter" value="'.$id.'" name="id" type="submit">'.$strapply.'</button>';
+echo '<button class="btn btn-default btn-sm" id="clear-filter" value="'.$id.'" name="id" type="submit">'.$strcancel.'</button>';
 echo '</div>';
 echo '</form>';
 echo $OUTPUT->heading(get_string('modulenameplural', 'certificate'));
